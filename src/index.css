@@ -507,6 +507,136 @@ button.picked {
   padding: 6px 0;
 }
 
+.list-section {
+  font-size: 13px;
+  color: #8a8a99;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin: 18px 4px 8px;
+}
+
+.list-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--card);
+  padding: 16px;
+  border-radius: 14px;
+  cursor: pointer;
+}
+
+.chevron {
+  color: #8a8a99;
+  font-size: 20px;
+}
+
+.seg {
+  display: flex;
+  gap: 8px;
+}
+
+.seg-btn {
+  flex: 1;
+  padding: 14px;
+  background: var(--card);
+  border-radius: 14px;
+  font-size: 15px;
+}
+
+.seg-btn.on {
+  background: var(--accent2);
+  outline: 2px solid #fff;
+}
+
+.profile-head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar-lg {
+  width: 88px;
+  height: 88px;
+  border-radius: 999px;
+  background: var(--card);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  font-weight: 700;
+}
+
+.avatar-lg.premium {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+}
+
+.profile-name {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.plan-pill {
+  font-size: 13px;
+  padding: 5px 14px;
+  border-radius: 999px;
+  background: var(--card);
+  color: #8a8a99;
+}
+
+.plan-pill.premium {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: #fff;
+}
+
+.premium-card {
+  background: var(--card);
+  border-radius: 18px;
+  padding: 22px;
+}
+
+.premium-card.active {
+  background: linear-gradient(
+    135deg,
+    rgba(150, 105, 225, 0.25),
+    rgba(125, 123, 247, 0.25)
+  );
+}
+
+.premium-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 14px;
+}
+
+.perks {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 18px;
+}
+
+.perks li {
+  padding: 8px 0;
+  font-size: 15px;
+}
+
+.profile-link {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.mini-plan {
+  color: var(--accent2);
+}
+
+.cat-lock {
+  font-size: 13px;
+  color: var(--accent2);
+  margin-top: 8px;
+}
+
 .primary-action {
   padding: 20px;
   font-size: 18px;

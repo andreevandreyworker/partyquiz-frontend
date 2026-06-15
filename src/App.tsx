@@ -6,6 +6,8 @@ import HomeScreen from "./screens/HomeScreen";
 import CategoriesScreen from "./screens/CategoriesScreen";
 import JoinScreen from "./screens/JoinScreen";
 import RoomScreen from "./screens/RoomScreen";
+import SettingsScreen from "./screens/SettingsScreen";
+import ProfileScreen from "./screens/ProfileScreen";
 
 export default function App() {
   const { authed } = useAuth();
@@ -34,6 +36,8 @@ export default function App() {
       <Route path="/" element={<HomeScreen />} />
       <Route path="/categories" element={<CategoriesScreen />} />
       <Route path="/join" element={<JoinScreen />} />
+      <Route path="/settings" element={<SettingsScreen />} />
+      <Route path="/profile" element={<ProfileScreen />} />
       <Route path="/room/:code" element={<RoomScreen />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

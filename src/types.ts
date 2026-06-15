@@ -2,12 +2,20 @@ export interface Tokens {
   access_token: string;
   user_id: string;
   login: string;
+  is_premium: boolean;
+}
+
+export interface Me {
+  user_id: string;
+  login: string;
+  is_premium: boolean;
 }
 
 export interface Category {
   id: string;
   ru: string;
   en: string;
+  premium: boolean;
 }
 
 export interface Player {

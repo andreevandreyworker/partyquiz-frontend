@@ -19,17 +19,19 @@ export default function LoginScreen() {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
-  const finish = (token: string, uid: string, lg: string) => {
-    signIn(token, uid, lg);
-    navigate("/");
-  };
-
   const playAsGuest = async () => {
     setError("");
     setBusy(true);
     try {
       const tokens = await api.guest(name.trim());
-      finish(tokens.access_token, tokens.user_id, tokens.login);
+      signIn(
+        tokens.access_token,
+        tokens.user_id,
+        tokens.login,
+        tokens.is_premium,
+        false,
+      );
+      navigate("/");
     } catch (e) {
       setError(t(errKey((e as Error).message)));
     } finally {
@@ -43,7 +45,14 @@ export default function LoginScreen() {
     try {
       const fn = mode === "login" ? api.login : api.register;
       const tokens = await fn(login.trim(), password);
-      finish(tokens.access_token, tokens.user_id, tokens.login);
+      signIn(
+        tokens.access_token,
+        tokens.user_id,
+        tokens.login,
+        tokens.is_premium,
+        true,
+      );
+      navigate("/");
     } catch (e) {
       setError(t(errKey((e as Error).message)));
     } finally {

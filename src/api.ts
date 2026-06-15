@@ -1,6 +1,7 @@
 import type {
   Category,
   Choice,
+  Me,
   Room,
   Statement,
   Tokens,
@@ -60,6 +61,8 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ login, password }),
     }),
+  me: () => request<Me>("/auth/me"),
+  upgrade: () => request<Tokens>("/auth/upgrade", { method: "POST" }),
   categories: () => request<Category[]>("/game/categories"),
   createRoom: (mode: string, categories: string[]) =>
     request<Room>("/game/rooms", {

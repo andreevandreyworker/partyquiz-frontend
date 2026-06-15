@@ -2,12 +2,14 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { api } from "../api";
+import { useAuth } from "../auth";
 import { errKey } from "../errors";
 import type { Category } from "../types";
 
 export default function CategoriesScreen() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const { isPremium } = useAuth();
   const [params] = useSearchParams();
   const mode = params.get("mode") === "solo" ? "solo" : "multi";
 
@@ -58,6 +60,7 @@ export default function CategoriesScreen() {
 
   const cat = cats[index];
   const label = i18n.language === "ru" ? cat.ru : cat.en;
+  const locked = cat.premium && !isPremium;
 
   return (
     <div className="screen">
@@ -75,7 +78,10 @@ export default function CategoriesScreen() {
       <div className="title">{t("pick_categories")}</div>
       <div className="meta">{t("swipe_hint")}</div>
       <div className="spacer" />
-      <div className="swipe-card">{label}</div>
+      <div className="swipe-card">
+        {label}
+        {locked && <div className="cat-lock">🔒 {t("premium_locked")}</div>}
+      </div>
       <div className="spacer" />
       {error && <div className="error">{error}</div>}
       <div className="row">
@@ -86,7 +92,10 @@ export default function CategoriesScreen() {
         >
           {t("skip")}
         </button>
-        <button disabled={busy} onClick={() => decide(true)}>
+        <button
+          disabled={busy || locked}
+          onClick={() => decide(true)}
+        >
           {t("norm")}
         </button>
       </div>

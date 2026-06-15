@@ -1,20 +1,33 @@
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../auth";
-import LangToggle from "../components/LangToggle";
 
 export default function HomeScreen() {
   const { t } = useTranslation();
-  const { login, signOut } = useAuth();
+  const { login, isPremium, isGuest } = useAuth();
   const navigate = useNavigate();
+
+  const name = isGuest ? t("guest_label") : login;
 
   return (
     <div className="screen">
       <div className="topbar">
         <div className="title">{t("app_title")}</div>
-        <LangToggle />
+        <button
+          className="icon-btn"
+          onClick={() => navigate("/settings")}
+          aria-label={t("settings")}
+        >
+          ⚙
+        </button>
       </div>
-      <div className="meta">{login}</div>
+      <div
+        className="meta profile-link"
+        onClick={() => navigate("/profile")}
+      >
+        {name}
+        {isPremium && <span className="mini-plan">★</span>}
+      </div>
       <div className="spacer" />
       <button onClick={() => navigate("/categories?mode=multi")}>
         {t("create_room")}
@@ -29,9 +42,6 @@ export default function HomeScreen() {
         {t("solo")}
       </button>
       <div className="spacer" />
-      <button className="ghost" onClick={signOut}>
-        {t("logout")}
-      </button>
     </div>
   );
 }
