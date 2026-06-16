@@ -8,6 +8,7 @@ import JoinScreen from "./screens/JoinScreen";
 import RoomScreen from "./screens/RoomScreen";
 import SettingsScreen from "./screens/SettingsScreen";
 import ProfileScreen from "./screens/ProfileScreen";
+import PremiumScreen from "./screens/PremiumScreen";
 
 export default function App() {
   const { authed } = useAuth();
@@ -38,6 +39,7 @@ export default function App() {
       <Route path="/join" element={<JoinScreen />} />
       <Route path="/settings" element={<SettingsScreen />} />
       <Route path="/profile" element={<ProfileScreen />} />
+      <Route path="/premium" element={<PremiumScreen />} />
       <Route path="/room/:code" element={<RoomScreen />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

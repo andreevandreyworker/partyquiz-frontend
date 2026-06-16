@@ -28,6 +28,16 @@ export default function HomeScreen() {
         {name}
         {isPremium && <span className="mini-plan">★</span>}
       </div>
+      {!isPremium && (
+        <div
+          className="home-premium-banner"
+          onClick={() => navigate("/premium")}
+        >
+          <span className="hpb-crown">👑</span>
+          <span className="hpb-text">{t("home_premium_banner")}</span>
+          <span className="chevron">›</span>
+        </div>
+      )}
       <div className="spacer" />
       <button onClick={() => navigate("/categories?mode=multi")}>
         {t("create_room")}

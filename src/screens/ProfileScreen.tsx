@@ -1,9 +1,6 @@
-import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { api } from "../api";
 import { useAuth } from "../auth";
-import { errKey } from "../errors";
 
 function initials(login: string): string {
   const parts = login.trim().split(/\s+/);
@@ -16,30 +13,9 @@ function initials(login: string): string {
 export default function ProfileScreen() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { login, isPremium, isGuest, signIn } = useAuth();
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState("");
+  const { login, isPremium, isGuest, signOut } = useAuth();
 
   const name = isGuest ? t("guest_label") : login ?? "";
-
-  const upgrade = async () => {
-    setBusy(true);
-    setError("");
-    try {
-      const tk = await api.upgrade();
-      signIn(
-        tk.access_token,
-        tk.user_id,
-        tk.login,
-        tk.is_premium,
-        true,
-      );
-    } catch (e) {
-      setError(t(errKey((e as Error).message)));
-    } finally {
-      setBusy(false);
-    }
-  };
 
   return (
     <div className="screen">
@@ -85,19 +61,23 @@ export default function ProfileScreen() {
             <li>🤖 {t("premium_perk_ai")}</li>
             <li>🎲 {t("premium_perk_codes")}</li>
           </ul>
-          {error && <div className="error">{error}</div>}
           {isGuest ? (
             <>
               <div className="meta" style={{ marginBottom: 12 }}>
                 {t("account_required")}
               </div>
-              <button onClick={() => navigate("/login")}>
+              <button
+                onClick={() => {
+                  signOut();
+                  navigate("/login");
+                }}
+              >
                 {t("create_account")}
               </button>
             </>
           ) : (
-            <button disabled={busy} onClick={upgrade}>
-              {busy ? t("activating") : t("activate")}
+            <button onClick={() => navigate("/premium")}>
+              {t("go_premium")}
             </button>
           )}
         </div>
