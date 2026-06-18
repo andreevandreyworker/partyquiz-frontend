@@ -64,7 +64,7 @@ export const api = {
   me: () => request<Me>("/auth/me"),
   upgrade: () => request<Tokens>("/auth/upgrade", { method: "POST" }),
   categories: () => request<Category[]>("/game/categories"),
-  createRoom: (mode: string, categories: string[]) =>
+  createRoom: (mode: string, categories: number[]) =>
     request<Room>("/game/rooms", {
       method: "POST",
       body: JSON.stringify({ mode, categories }),

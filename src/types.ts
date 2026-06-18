@@ -12,10 +12,12 @@ export interface Me {
 }
 
 export interface Category {
-  id: string;
+  id: number;
   ru: string;
   en: string;
   premium: boolean;
+  icon?: string | null;
+  video?: string | null;
 }
 
 export interface Player {
@@ -45,7 +47,7 @@ export interface Room {
   mode: string;
   status: string;
   phase: string;
-  categories: string[];
+  categories: number[];
   host_user_id: string;
   players: Player[];
   current_question: Statement | null;

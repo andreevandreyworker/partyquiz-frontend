@@ -1,6 +1,8 @@
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import { useAuth } from "../auth";
+import { spring, container, item, haptic } from "../motion";
 
 function initials(login: string): string {
   const parts = login.trim().split(/\s+/);
@@ -13,75 +15,88 @@ function initials(login: string): string {
 export default function ProfileScreen() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { login, isPremium, isGuest, signOut } = useAuth();
+  const { login, isPremium, isGuest } = useAuth();
 
   const name = isGuest ? t("guest_label") : login ?? "";
 
   return (
-    <div className="screen">
-      <div className="topbar">
-        <button
-          className="ghost langtoggle"
-          onClick={() => navigate("/settings")}
+    <motion.div
+      className="screen pq-auth"
+      variants={container}
+      initial="hidden"
+      animate="show"
+    >
+      <motion.div className="pq-header" variants={item}>
+        <motion.button
+          className="pq-back"
+          whileTap={{ scale: 0.92 }}
+          transition={spring.snappy}
+          onClick={() => {
+            haptic(8);
+            navigate(-1);
+          }}
         >
-          {t("back")}
-        </button>
-        <div className="title">{t("profile")}</div>
-        <div style={{ width: 44 }} />
-      </div>
+          ‹ {t("back")}
+        </motion.button>
+      </motion.div>
 
-      <div className="spacer" />
-
-      <div className="profile-head">
-        <div className={`avatar-lg ${isPremium ? "premium" : ""}`}>
+      <motion.div className="pq-profile-head" variants={item}>
+        <div className={`pq-avatar-lg ${isPremium ? "premium" : ""}`}>
           {initials(name)}
         </div>
-        <div className="profile-name">{name}</div>
-        <div className={`plan-pill ${isPremium ? "premium" : ""}`}>
+        <div className="pq-profile-name">{name}</div>
+        <div className={`pq-plan-pill ${isPremium ? "premium" : ""}`}>
           {isPremium ? t("premium_plan") : t("free_plan")}
         </div>
-      </div>
-
-      <div className="spacer" />
+      </motion.div>
 
       {isPremium ? (
-        <div className="premium-card active">
-          <div className="premium-title">{t("premium_active")}</div>
-          <ul className="perks">
+        <motion.div className="pq-auth-card" variants={item}>
+          <div className="pq-auth-title">{t("premium_active")}</div>
+          <ul className="pq-perks">
             <li>✓ {t("premium_perk_hot")}</li>
             <li>✓ {t("premium_perk_ai")}</li>
             <li>✓ {t("premium_perk_codes")}</li>
           </ul>
-        </div>
+        </motion.div>
       ) : (
-        <div className="premium-card">
-          <div className="premium-title">{t("premium_title")}</div>
-          <ul className="perks">
+        <motion.div className="pq-auth-card" variants={item}>
+          <div className="pq-auth-title">{t("premium_title")}</div>
+          <ul className="pq-perks">
             <li>🔓 {t("premium_perk_hot")}</li>
             <li>🤖 {t("premium_perk_ai")}</li>
             <li>🎲 {t("premium_perk_codes")}</li>
           </ul>
           {isGuest ? (
             <>
-              <div className="meta" style={{ marginBottom: 12 }}>
-                {t("account_required")}
-              </div>
-              <button
+              <p className="pq-about">{t("account_required")}</p>
+              <motion.button
+                className="pq-btn-primary"
+                whileTap={{ scale: 0.96 }}
+                transition={spring.snappy}
                 onClick={() => {
-                  signOut();
-                  navigate("/login");
+                  haptic(10);
+                  navigate("/login", { state: { mode: "register" } });
                 }}
               >
                 {t("create_account")}
-              </button>
+              </motion.button>
             </>
           ) : (
-            <button onClick={() => navigate("/premium")}>
+            <motion.button
+              className="pq-btn-primary"
+              whileTap={{ scale: 0.96 }}
+              transition={spring.snappy}
+              onClick={() => {
+                haptic(10);
+                navigate("/premium");
+              }}
+            >
               {t("go_premium")}
-            </button>
+            </motion.button>
           )}
-        </div>
+        </motion.div>
       )}
-    </div>
+    </motion.div>
   );
 }

@@ -9,6 +9,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fontsource-variable/comfortaa": "^5.2.8",
+    "@fontsource-variable/nunito": "^5.2.7",
+    "canvas-confetti": "^1.9.4",
+    "framer-motion": "^12.40.0",
     "i18next": "^23.16.8",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -16,9 +20,11 @@
     "react-router-dom": "^6.28.0"
   },
   "devDependencies": {
+    "@types/canvas-confetti": "^1.9.0",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.4",
+    "playwright": "^1.61.0",
     "typescript": "^5.6.3",
     "vite": "^5.4.11"
   }

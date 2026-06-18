@@ -65,7 +65,7 @@ const resources = {
       add_question: "Свой вопрос",
       your_question: "Ваш вопрос",
       ai_help: "Помощь ИИ",
-      ai_thinking: "ИИ думает…",
+      ai_thinking: "ИИ придумывает",
       send: "Отправить",
       cancel: "Отмена",
       in_queue: "в очереди",
@@ -121,8 +121,41 @@ const resources = {
       perk_badge_d: "Выделяйся в списке игроков",
       home_premium_banner: "Открой всё с Premium",
       premium_thanks: "Спасибо, что выбрал Premium! 🎉",
+      start_game: "Начать игру",
+      home_slogan: "Голосуй. Спорь. Веселись.",
+      enter_room: "Войти в комнату",
+      logo_top: "НОРМ",
+      logo_bottom: "СТРЁМ",
+      logo_or: "или",
+      teaser_label: "Пример вопроса",
+      chip_norm: "норм",
+      chip_strem: "стрём",
+      teaser_items: [
+        "Списать на экзамене",
+        "Лайкнуть фото бывшего в 2 ночи",
+        "Гуглить симптомы простуды",
+        "Ананасы на пицце",
+        "Прочитать чужую переписку",
+        "Петь в караоке трезвым",
+        "Ответить «ок» на длинное сообщение",
+        "Отмечать день рождения заранее",
+      ],
+      loading_title: "Готовим игру…",
+      loading_sub: "Тасуем карточки и зовём котика",
+      loading_tip: "Свайпни вправо «норм», влево «стрём»",
+      adding_category: "Добавляем",
+      adding_category_q: "категорию?",
+      pick_hint: "Можно несколько",
+      picked_stat: "Выбрали {{pct}}%",
+      picked_count: "Выбрано: {{n}} из {{total}}",
+      lobby_title: "Комната готова!",
+      lobby_share: "Скинь код друзьям",
+      players_n: "Игроков: {{n}}",
+      round_q: "Что скажешь?",
       err_login_taken: "Логин занят",
       err_invalid_credentials: "Неверный логин или пароль",
+      err_login_short: "Логин минимум 3 символа",
+      err_pass_short: "Пароль минимум 4 символа",
       err_room_not_found: "Комната не найдена",
       err_too_many_pending: "Слишком много вопросов в очереди",
       err_ai_unavailable: "ИИ недоступен, попробуйте позже",
@@ -193,7 +226,7 @@ const resources = {
       add_question: "Add question",
       your_question: "Your question",
       ai_help: "AI help",
-      ai_thinking: "AI is thinking…",
+      ai_thinking: "AI is cooking",
       send: "Send",
       cancel: "Cancel",
       in_queue: "in queue",
@@ -249,8 +282,41 @@ const resources = {
       perk_badge_d: "Stand out in the player list",
       home_premium_banner: "Unlock everything with Premium",
       premium_thanks: "Thanks for going Premium! 🎉",
+      start_game: "Start game",
+      home_slogan: "Vote. Argue. Have fun.",
+      enter_room: "Enter room",
+      logo_top: "FINE",
+      logo_bottom: "CRINGE",
+      logo_or: "or",
+      teaser_label: "Example question",
+      chip_norm: "fine",
+      chip_strem: "cringe",
+      teaser_items: [
+        "Cheating on an exam",
+        "Liking your ex's photo at 2am",
+        "Googling cold symptoms",
+        "Pineapple on pizza",
+        "Reading someone's texts",
+        "Karaoke while sober",
+        "Replying \"ok\" to a long message",
+        "Celebrating your birthday early",
+      ],
+      loading_title: "Getting ready…",
+      loading_sub: "Shuffling cards and calling the cat",
+      loading_tip: "Swipe right for “norm”, left for “cringe”",
+      adding_category: "Adding a",
+      adding_category_q: "category?",
+      pick_hint: "Choose a few",
+      picked_stat: "{{pct}}% picked it",
+      picked_count: "Picked: {{n}} of {{total}}",
+      lobby_title: "Room is ready!",
+      lobby_share: "Share the code with friends",
+      players_n: "Players: {{n}}",
+      round_q: "What do you say?",
       err_login_taken: "Login already taken",
       err_invalid_credentials: "Wrong login or password",
+      err_login_short: "Login: at least 3 characters",
+      err_pass_short: "Password: at least 4 characters",
       err_room_not_found: "Room not found",
       err_too_many_pending: "Too many questions in queue",
       err_ai_unavailable: "AI unavailable, try later",
@@ -266,6 +332,71 @@ i18n.use(initReactI18next).init({
   fallbackLng: "en",
   interpolation: { escapeValue: false },
 });
+
+const CACHE_KEY = "pq_i18n_cache";
+
+function hydrate(raw: string): unknown {
+  if (raw && (raw[0] === "[" || raw[0] === "{")) {
+    try {
+      return JSON.parse(raw);
+    } catch {
+      return raw;
+    }
+  }
+  return raw;
+}
+
+try {
+  const cached = JSON.parse(localStorage.getItem(CACHE_KEY) ?? "{}");
+  for (const [lng, dict] of Object.entries(cached))
+    i18n.addResourceBundle(lng, "translation", dict, true, true);
+} catch {
+  // bundled floor covers this
+}
+
+export async function refreshTranslations(): Promise<void> {
+  try {
+    const lr = await fetch(
+      "/cms/items/languages?filter[enabled][_eq]=true" +
+        "&fields=code&sort=sort&limit=-1",
+    );
+    const langs: string[] = lr.ok
+      ? (await lr.json()).data.map((l: { code: string }) => l.code)
+      : ["ru", "en"];
+    const cache: Record<string, Record<string, unknown>> = {};
+    for (const lng of langs) {
+      const r = await fetch(
+        `/cms/items/ui_translations?filter[lang][_eq]=${lng}` +
+          "&fields=key,value&limit=-1",
+      );
+      if (!r.ok) continue;
+      const { data } = await r.json();
+      const dict: Record<string, unknown> = {};
+      for (const row of data) dict[row.key] = hydrate(row.value);
+      i18n.addResourceBundle(lng, "translation", dict, true, true);
+      cache[lng] = dict;
+    }
+    localStorage.setItem(CACHE_KEY, JSON.stringify(cache));
+    i18n.changeLanguage(i18n.language);
+  } catch {
+    // bundled floor + cache already applied
+  }
+}
+
+export async function loadLanguages(): Promise<
+  { code: string; name: string; flag: string }[]
+> {
+  try {
+    const r = await fetch(
+      "/cms/items/languages?filter[enabled][_eq]=true" +
+        "&fields=code,name,flag&sort=sort&limit=-1",
+    );
+    if (!r.ok) return [];
+    return (await r.json()).data;
+  } catch {
+    return [];
+  }
+}
 
 export function setLang(lang: string): void {
   localStorage.setItem("pq_lang", lang);

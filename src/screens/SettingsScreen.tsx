@@ -1,62 +1,89 @@
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import { useAuth } from "../auth";
-import { setLang } from "../i18n";
+import { setLang, loadLanguages } from "../i18n";
+import { spring, container, item, haptic } from "../motion";
+
+const FALLBACK_LANGS = [
+  { code: "ru", name: "Русский", flag: "ru" },
+  { code: "en", name: "English", flag: "en" },
+];
 
 export default function SettingsScreen() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { login, isGuest, signOut } = useAuth();
+  const [langs, setLangs] = useState(FALLBACK_LANGS);
+
+  useEffect(() => {
+    loadLanguages().then((l) => {
+      if (l.length) setLangs(l);
+    });
+  }, []);
 
   return (
-    <div className="screen">
-      <div className="topbar">
-        <button
-          className="ghost langtoggle"
-          onClick={() => navigate("/")}
+    <motion.div
+      className="screen pq-auth"
+      variants={container}
+      initial="hidden"
+      animate="show"
+    >
+      <motion.div className="pq-header" variants={item}>
+        <motion.button
+          className="pq-back"
+          whileTap={{ scale: 0.92 }}
+          transition={spring.snappy}
+          onClick={() => {
+            haptic(8);
+            navigate("/");
+          }}
         >
-          {t("back")}
+          ‹ {t("back")}
+        </motion.button>
+      </motion.div>
+
+      <motion.h1 className="pq-page-title" variants={item}>
+        {t("settings")}
+      </motion.h1>
+
+      <motion.div className="pq-auth-card" variants={item}>
+        <div className="pq-section">{t("account")}</div>
+        <button className="pq-row" onClick={() => navigate("/profile")}>
+          <span>{isGuest ? t("guest_label") : login}</span>
+          <span className="pq-row-chev">›</span>
         </button>
-        <div className="title">{t("settings")}</div>
-        <div style={{ width: 44 }} />
-      </div>
 
-      <div className="spacer" />
+        <div className="pq-section">{t("language")}</div>
+        <div className="pq-seg">
+          {langs.map((l) => (
+            <button
+              key={l.code}
+              className={`pq-seg-btn ${i18n.language === l.code ? "on" : ""}`}
+              onClick={() => {
+                haptic(8);
+                setLang(l.code);
+              }}
+            >
+              {l.name}
+            </button>
+          ))}
+        </div>
 
-      <div className="list-section">{t("account")}</div>
-      <div
-        className="list-row"
-        onClick={() => navigate("/profile")}
+        <div className="pq-section">{t("about")}</div>
+        <p className="pq-about">{t("about_text")}</p>
+      </motion.div>
+
+      <motion.button
+        className="pq-btn-light pq-logout"
+        variants={item}
+        whileTap={{ scale: 0.96 }}
+        transition={spring.snappy}
+        onClick={signOut}
       >
-        <span>{isGuest ? t("guest_label") : login}</span>
-        <span className="chevron">›</span>
-      </div>
-
-      <div className="list-section">{t("language")}</div>
-      <div className="seg">
-        <button
-          className={`seg-btn ${i18n.language === "ru" ? "on" : ""}`}
-          onClick={() => setLang("ru")}
-        >
-          Русский
-        </button>
-        <button
-          className={`seg-btn ${i18n.language === "en" ? "on" : ""}`}
-          onClick={() => setLang("en")}
-        >
-          English
-        </button>
-      </div>
-
-      <div className="list-section">{t("about")}</div>
-      <div className="meta" style={{ padding: "0 4px" }}>
-        {t("about_text")}
-      </div>
-
-      <div className="spacer" />
-      <button className="ghost" onClick={signOut}>
         {t("logout")}
-      </button>
-    </div>
+      </motion.button>
+    </motion.div>
   );
 }

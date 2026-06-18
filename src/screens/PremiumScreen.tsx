@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import { api } from "../api";
 import { useAuth } from "../auth";
 import { errKey } from "../errors";
+import { spring, container, item, haptic } from "../motion";
 
 const PERKS = [
   { icon: "🔥", t: "perk_hot_t", d: "perk_hot_d" },
@@ -17,7 +19,7 @@ const PERKS = [
 export default function PremiumScreen() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { isPremium, isGuest, signIn, signOut } = useAuth();
+  const { isPremium, isGuest, signIn } = useAuth();
   const [plan, setPlan] = useState<"monthly" | "yearly">("yearly");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -25,15 +27,10 @@ export default function PremiumScreen() {
   const buy = async () => {
     setBusy(true);
     setError("");
+    haptic(10);
     try {
       const tk = await api.upgrade();
-      signIn(
-        tk.access_token,
-        tk.user_id,
-        tk.login,
-        tk.is_premium,
-        true,
-      );
+      signIn(tk.access_token, tk.user_id, tk.login, tk.is_premium, true);
       navigate("/profile");
     } catch (e) {
       setError(t(errKey((e as Error).message)));
@@ -43,98 +40,120 @@ export default function PremiumScreen() {
   };
 
   return (
-    <div className="screen paywall">
-      <div className="topbar">
-        <button
-          className="ghost langtoggle"
-          onClick={() => navigate(-1)}
+    <motion.div
+      className="screen pq-auth"
+      variants={container}
+      initial="hidden"
+      animate="show"
+    >
+      <motion.div className="pq-header" variants={item}>
+        <motion.button
+          className="pq-back"
+          whileTap={{ scale: 0.92 }}
+          transition={spring.snappy}
+          onClick={() => {
+            haptic(8);
+            navigate(-1);
+          }}
         >
-          {t("back")}
-        </button>
-        <div className="title">{t("premium_title")}</div>
-        <div style={{ width: 44 }} />
-      </div>
+          ‹ {t("back")}
+        </motion.button>
+      </motion.div>
 
-      <div className="paywall-hero">
-        <div className="paywall-crown">👑</div>
-        <div className="paywall-sub">{t("premium_subtitle")}</div>
-      </div>
+      <motion.div
+        className="pq-paywall-hero"
+        variants={item}
+        animate={{ y: [0, -6, 0] }}
+        transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+      >
+        <div className="pq-paywall-crown">👑</div>
+        <div className="pq-paywall-title">{t("premium_title")}</div>
+        <div className="pq-paywall-sub">{t("premium_subtitle")}</div>
+      </motion.div>
 
-      <div className="list-section">{t("whats_included")}</div>
-      <div className="perk-grid">
-        {PERKS.map((p) => (
-          <div className="perk-item" key={p.t}>
-            <div className="perk-icon">{p.icon}</div>
-            <div>
-              <div className="perk-t">{t(p.t)}</div>
-              <div className="perk-d">{t(p.d)}</div>
+      <motion.div className="pq-auth-card" variants={item}>
+        <div className="pq-section">{t("whats_included")}</div>
+        <div className="pq-perk-grid">
+          {PERKS.map((p) => (
+            <div className="pq-perk-item" key={p.t}>
+              <div className="pq-perk-icon">{p.icon}</div>
+              <div>
+                <div className="pq-perk-t">{t(p.t)}</div>
+                <div className="pq-perk-d">{t(p.d)}</div>
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      </motion.div>
 
       {isPremium ? (
-        <div className="premium-card active" style={{ marginTop: 18 }}>
-          <div className="premium-title">{t("premium_active")}</div>
-        </div>
+        <motion.div className="pq-auth-card" variants={item}>
+          <div className="pq-auth-title">{t("premium_active")}</div>
+        </motion.div>
       ) : (
-        <>
-          <div className="list-section">{t("status")}</div>
-          <div className="plan-grid">
+        <motion.div className="pq-auth-card" variants={item}>
+          <div className="pq-section">{t("status")}</div>
+          <div className="pq-plan-grid">
             <button
-              className={`plan-opt ${plan === "monthly" ? "on" : ""}`}
-              onClick={() => setPlan("monthly")}
+              className={`pq-plan-opt ${plan === "monthly" ? "on" : ""}`}
+              onClick={() => {
+                haptic(8);
+                setPlan("monthly");
+              }}
             >
-              <div className="plan-name">{t("plan_monthly")}</div>
-              <div className="plan-price">
+              <div className="pq-plan-name">{t("plan_monthly")}</div>
+              <div className="pq-plan-price">
                 {t("price_monthly")}
                 <span>{t("per_month")}</span>
               </div>
             </button>
             <button
-              className={`plan-opt ${plan === "yearly" ? "on" : ""}`}
-              onClick={() => setPlan("yearly")}
+              className={`pq-plan-opt ${plan === "yearly" ? "on" : ""}`}
+              onClick={() => {
+                haptic(8);
+                setPlan("yearly");
+              }}
             >
-              <div className="plan-badge">{t("best_value")}</div>
-              <div className="plan-name">{t("plan_yearly")}</div>
-              <div className="plan-price">
+              <div className="pq-plan-badge">{t("best_value")}</div>
+              <div className="pq-plan-name">{t("plan_yearly")}</div>
+              <div className="pq-plan-price">
                 {t("price_yearly")}
                 <span>{t("per_year")}</span>
               </div>
-              <div className="plan-save">{t("yearly_save")}</div>
+              <div className="pq-plan-save">{t("yearly_save")}</div>
             </button>
           </div>
 
-          {error && <div className="error">{error}</div>}
+          {error && <div className="pq-err">{error}</div>}
 
           {isGuest ? (
-            <div className="paywall-cta">
-              <div className="meta" style={{ marginBottom: 12 }}>
-                🔒 {t("premium_only_registered")}
-              </div>
-              <button
+            <>
+              <p className="pq-about">🔒 {t("premium_only_registered")}</p>
+              <motion.button
+                className="pq-btn-primary"
+                whileTap={{ scale: 0.96 }}
+                transition={spring.snappy}
                 onClick={() => {
-                  signOut();
-                  navigate("/login");
+                  haptic(10);
+                  navigate("/login", { state: { mode: "register" } });
                 }}
               >
                 {t("create_account")}
-              </button>
-            </div>
+              </motion.button>
+            </>
           ) : (
-            <div className="paywall-cta">
-              <button
-                className="buy-btn"
-                disabled={busy}
-                onClick={buy}
-              >
-                {busy ? t("activating") : t("premium_cta")}
-              </button>
-            </div>
+            <motion.button
+              className="pq-btn-primary"
+              whileTap={{ scale: 0.96 }}
+              transition={spring.snappy}
+              disabled={busy}
+              onClick={buy}
+            >
+              {busy ? t("activating") : t("premium_cta")}
+            </motion.button>
           )}
-        </>
+        </motion.div>
       )}
-      <div className="spacer" />
-    </div>
+    </motion.div>
   );
 }
